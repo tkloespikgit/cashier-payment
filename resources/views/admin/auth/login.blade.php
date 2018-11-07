@@ -12,6 +12,16 @@
 <body>
 <div class="container">
     <div class="row">
+        @if(Session::has('Messages'))
+            @foreach(json_decode(Session::get('Messages')) as $Message)
+                <div class="col-lg-12">
+                    <div class="alert alert-{{Session::get('Message_type')}} alert-dismissable">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        {{$Message}}
+                    </div>
+                </div>
+            @endforeach
+        @endif
         <div class="col-md-4 col-md-offset-4">
             <div class="login-panel panel panel-default">
                 <div class="panel-heading">
@@ -20,12 +30,13 @@
                 <div class="panel-body">
                     <form role="form" action="{{url('login')}}" method="post">
                         {{csrf_field()}}
+                        <input type="hidden">
                         <fieldset>
                             <div class="form-group">
-                                <input class="form-control" placeholder="账号" name="account" type="text" autofocus>
+                                <input class="form-control" placeholder="账号" name="account" type="text" value="{{old('account','admin')}}" autofocus>
                             </div>
                             <div class="form-group">
-                                <input class="form-control" placeholder="密码" name="password" type="password" value="">
+                                <input class="form-control" placeholder="密码" name="password" type="password" value="123456aaa">
                             </div>
                             @include('include.captcha')
                             <input type="submit" name="doSubmit" class="btn btn-success btn-block" value="登录">

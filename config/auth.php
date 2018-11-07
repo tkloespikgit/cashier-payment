@@ -105,4 +105,7 @@ return [
         ],
     ],
 
+    'maxLoginAttempts' => env('LOGIN_ATTEMPT',100),
+    'lockTime' => 20, // minutes
+
 ];

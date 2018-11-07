@@ -11,7 +11,6 @@ class UserController extends InitController
 {
     //
 
-
     public function createUser(Request $request)
     {
         if ($request ->isMethod('get')) {
@@ -27,7 +26,7 @@ class UserController extends InitController
 
                 $user = User::create([
                     'account' => $request ->input('account'),
-                    'password' => encrypt($request->input('password')),
+                    'password' => bcrypt($request->input('password')),
                     'phone' => $validator['phone'],
                     'email' => $request ->input('email'),
                     'phone_status' => 0,

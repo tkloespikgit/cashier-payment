@@ -183,6 +183,8 @@ return [
         Mews\Captcha\CaptchaServiceProvider::class,
         Propaganistas\LaravelPhone\PhoneServiceProvider::class,
 
+        Zizaco\Entrust\EntrustServiceProvider::class,
+
     ],
 
     /*
@@ -233,6 +235,8 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
 
         'Captcha' => Mews\Captcha\Facades\Captcha::class,
+
+        'Entrust' => Zizaco\Entrust\EntrustFacade::class,
     ],
 
 ];

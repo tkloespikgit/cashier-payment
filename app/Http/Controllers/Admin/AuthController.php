@@ -13,10 +13,68 @@ class AuthController extends InitController
 
     public function loginPortal(Request $request)
     {
+        if (auth('admin')->check()) {
+            return redirect() ->intended('/');
+        }
+
         if ($request ->isMethod('get')) {
 
             return view('admin.auth.login');
+        } else {
+            $validator = \Validator::make($request->all(),[
+                'account' => 'required',
+                'password' => 'required',
+                'captcha' => 'captcha|required'
+            ]);
+            if ($validator ->fails()) {
+                self::setMessages($validator ->errors()->all(),'w');
+                return redirect()->back()->withInput();
+
+            }
+            $maxLoginAttempts = config('auth.maxLoginAttempts',5);
+            $lockTime = config('auth.lockTime',20);
+            if (\Session::has('AdminUnlockTime') && \Session::get('AdminUnlockTime')>time()) {
+                self::setMessages(
+                    [trans('auth.throttle',['seconds' =>\Session::get('AdminUnlockTime') - time()])]
+                );
+                return redirect()->back()->withInput();
+
+            } elseif (\Session::has('AdminUnlockTime') && \Session::get('AdminUnlockTime')<time()) {
+                \Session::forget('AdminAttempt');
+                \Session::forget('AdminUnlockTime');
+            }
+
+            if (\Session::get('AdminAttempt')>$maxLoginAttempts) {
+                \Session::put('AdminUnlockTime',time()+$lockTime*60);
+                self::setMessages([trans('auth.throttle',['seconds' => $lockTime*60])]);
+                return redirect()->back()->withInput();
+            }
+
+            try{
+                $admin = Admin::where('account',$request->input('account'))->where('status',1)->firstOrFail();
+            } catch (ModelNotFoundException $exception) {
+                \Session::increment('AdminAttempt',1);
+                self::setMessages([trans('auth.failed')],'w');
+                return redirect()->back()->withInput();
+            }
+
+            if (\Hash::check($request->input('password'),$admin->password)) {
+                \Auth::guard('admin')->loginUsingId($admin->id);
+                \Session::forget('AdminAttempt');
+                \Session::forget('AdminUnlockTime');
+                return redirect('/');
+            } else {
+                \Session::increment('AdminAttempt',1);
+                self::setMessages([trans('auth.failed')],'w');
+                return redirect()->back()->withInput();
+            }
         }
+    }
+
+    public function logout()
+    {
+        \Auth::guard('admin') ->logout();
+        return redirect('login');
     }
 
 
@@ -36,7 +94,7 @@ class AuthController extends InitController
 
                 $admin = Admin::create([
                     'account' => $request ->input('account'),
-                    'password' => encrypt($request->input('password')),
+                    'password' => bcrypt($request->input('password')),
                     'phone' => $validator['phone'],
                     'email' => $request ->input('email'),
                     'phone_status' => 0,
@@ -61,6 +119,7 @@ class AuthController extends InitController
     {
 
     }
+
 
 
     private function createValidate(Request $request)
@@ -103,4 +162,5 @@ class AuthController extends InitController
         }
         return $response;
     }
+
 }

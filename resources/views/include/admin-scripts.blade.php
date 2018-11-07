@@ -4,6 +4,7 @@
 <script src="{{asset('js/raphael/raphael.min.js')}}"></script>
 <script src="{{asset('js/morrisjs/morris.min.js')}}"></script>
 <script src="{{asset('js/sb-admin-2.min.js')}}"></script>
+<script src="{{asset('js/layer/layer.js')}}"></script>
 <script>
     $(document).ready(function(){
         if(window.console || "console" in window) {
@@ -16,6 +17,15 @@
     var SystemFunc = {
         ReloadCaptcha : function () {
             $("#captcha").attr('src','{{captcha_src('flat')}}'+'?'+Math.random())
+        },
+        OpenFrame : function ($_url,$width = 800,$height = 900) {
+            layer.open({
+                type: 2,
+                area: [$width+'px', $height+'px'],
+                fixed: false,
+                maxmin: true,
+                content: $_url
+            });
         }
     }
 </script>

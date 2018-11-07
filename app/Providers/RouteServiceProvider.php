@@ -57,9 +57,10 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapWebRoutes()
     {
-        Route::middleware('web')
-             ->namespace($this->namespace)
-             ->group(base_path('routes/web.php'));
+        Route::domain(config('domain.user'))
+            ->middleware('web')
+            ->namespace($this->namespace)
+            ->group(base_path('routes/web.php'));
     }
 
     /**
@@ -79,7 +80,8 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function mapAdminRoutes()
     {
-        Route::middleware('web')
+        Route::domain(config('domain.admin'))
+            ->middleware('web')
             ->namespace($this->namespaceAdmin)
             ->group(base_path('routes/admin.php'));
     }
@@ -87,7 +89,8 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function mapCashierRoutes()
     {
-        Route::middleware('web')
+        Route::domain(config('domain.cashier'))
+            ->middleware('web')
             ->namespace($this->namespaceCashier)
             ->group(base_path('routes/cashier.php'));
     }
