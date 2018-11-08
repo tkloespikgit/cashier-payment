@@ -9,7 +9,18 @@
     @include('include.admin-links')
 </head>
 <body>
-@yield('content')
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h5>@yield('title')</h5>
+            </div>
+            <div class="panel-body">
+                @yield('content')
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 @include('include.admin-scripts')
 </html>

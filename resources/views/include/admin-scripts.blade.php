@@ -18,14 +18,42 @@
         ReloadCaptcha : function () {
             $("#captcha").attr('src','{{captcha_src('flat')}}'+'?'+Math.random())
         },
-        OpenFrame : function ($_url,$width = 800,$height = 900) {
+        OpenFrame : function ($_url) {
             layer.open({
                 type: 2,
-                area: [$width+'px', $height+'px'],
+                title: false,
+                area: ['700px', '80%'],
                 fixed: false,
                 maxmin: true,
                 content: $_url
             });
+        },
+        ajaxGet : function ($_url) {
+            if (confirm("Are you sure to do this operation ?"))  {
+                $.get($_url,function (response) {
+                    alert(response.message);
+                    window.location.reload();
+                });
+            }
         }
-    }
+    };
+
+    $("a.open-frame").click(function () {
+        SystemFunc.OpenFrame($(this).data('url'))
+    });
+    $("#frameSubmit").click(function () {
+        var _index = parent.layer.getFrameIndex(window.name);
+        var _form = $('#frameForm');
+        var url = _form.attr('action');
+        $.post(url,_form.serialize(),function (response) {
+            layer.msg(response.message);
+            if (parseInt(response.status) === 1) {
+                parent.location.reload();
+                parent.layer.close(_index);
+            } else {
+                SystemFunc.ReloadCaptcha();
+            }
+        });
+    });
+
 </script>

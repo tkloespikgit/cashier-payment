@@ -3,20 +3,22 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Permission;
+use App\Role;
 use Illuminate\Http\Request;
 
-class PermissionController extends InitController
+class RoleController extends InitController
 {
     //
 
-    public function listPermission(Request $request)
+    public function rolesList(Request $request)
     {
-        $permissions = Permission::paginate(15);
         if ($request ->isMethod('get')) {
-            return view('admin.auth.permissions',compact('permissions'));
+            $roles = Role::paginate(15);
+            $permissions = Permission::all();
+            return view('admin.auth.roles',compact('roles','permissions'));
         } else {
             $validator = \Validator::make($request ->all(),[
-                'key' => 'required|alpha_dash|max:20|unique:permissions,name',
+                'key' => 'required|alpha_dash|max:20|unique:roles,name',
                 'display_name' => 'required|max:30',
                 'description' => 'required|max:200',
                 'captcha' => 'required|captcha'
@@ -26,27 +28,28 @@ class PermissionController extends InitController
                 self::setMessages($validator->errors()->all(),'d');
                 return redirect() ->back() ->withInput();
             } else {
-
-                $permission = Permission::create([
+                $role = Role::create([
                     'name' => $request ->input('key'),
                     'display_name' => $request ->input('display_name'),
                     'description' => $request ->input('description')
                 ]);
-                self::setMessages(['create permission ('.$permission ->display_name.') success !'],'s');
-                return redirect() ->back() ->with('new_id',$permission ->id);
-
+                if (count($request->input('permissions'))>0) {
+                    $role ->perms() ->sync($request ->input(['permissions']));
+                }
+                self::setMessages(['create role ('.$role ->display_name.') success !'],'s');
+                return redirect() ->back() ->with('new_id',$role ->id);
             }
-
         }
     }
 
-    public function editPermission(Request $request,$id)
+    public function editRole(Request $request,$id)
     {
-        $permission = Permission::find($id);
+        $role = Role::find($id);
         if ($request ->isMethod('get')) {
-            return view('admin.frame.edit-permission',compact('permission'));
-        } else {
+            $permissions = Permission::all();
 
+            return view('admin.frame.edit-role',compact('role','permissions'));
+        } else {
             $validator = \Validator::make($request ->all(),[
                 'key' => 'required|alpha_dash|max:20',
                 'display_name' => 'required|max:30',
@@ -56,23 +59,34 @@ class PermissionController extends InitController
             if ($validator ->fails()) {
                 return self::ajaxReturn($validator ->errors() ->first());
             } else {
-                $count = \DB::table('permissions')
+                $count = \DB::table('roles')
                     ->where('name',$request ->input('key'))
-                    ->where('id','!=',$permission->id)
+                    ->where('id','!=',$role->id)
                     ->count();
                 if ($count > 0) {
                     return self::ajaxReturn("The key(name) field is occupied !");
                 } else {
-                    $permission ->update([
+                    $role ->update([
                         'name' => $request ->input('key'),
                         'display_name' => $request ->input('display_name'),
                         'description' => $request ->input('description')
                     ]);
 
-                    $permission ->save();
+                    $role ->save();
+
+                    if (count($request->input('permissions'))>0) {
+                        $role ->perms() ->sync($request ->input(['permissions']));
+                    } else {
+                        $role ->perms() ->sync([]);
+                    }
+
                     return self::ajaxReturn("Update permission success !",1);
                 }
             }
+
+
+
         }
+
     }
 }

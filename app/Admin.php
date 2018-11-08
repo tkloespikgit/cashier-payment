@@ -10,7 +10,7 @@ class Admin extends Authenticatable
 {
     use EntrustUserTrait,Notifiable;
 
-    protected $table='admin';
+    protected $table='admins';
 
     protected $fillable = [
         'name', 'account', 'email', 'email_status', 'phone', 'phone_country', 'phone_status', 'password', 'secret_token' ,'status'

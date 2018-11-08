@@ -33,10 +33,10 @@
                         <input type="hidden">
                         <fieldset>
                             <div class="form-group">
-                                <input class="form-control" placeholder="账号" name="account" type="text" value="{{old('account','admin')}}" autofocus>
+                                <input class="form-control" placeholder="账号" name="account" type="text" value="{{old('account')}}" autofocus>
                             </div>
                             <div class="form-group">
-                                <input class="form-control" placeholder="密码" name="password" type="password" value="123456aaa">
+                                <input class="form-control" placeholder="密码" name="password" type="password">
                             </div>
                             @include('include.captcha')
                             <input type="submit" name="doSubmit" class="btn btn-success btn-block" value="登录">

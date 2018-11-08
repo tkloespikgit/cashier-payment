@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Tools;
 use App\Admin;
+use App\Role;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 class AuthController extends InitController
 {
     //
+
 
     public function loginPortal(Request $request)
     {
@@ -77,13 +79,13 @@ class AuthController extends InitController
         return redirect('login');
     }
 
-
-
     public function createAdmin(Request $request)
     {
         if ($request ->isMethod('get')) {
 
-            return view('admin.auth.create');
+            $admins = Admin::all();
+            $roles = Role::all();
+            return view('admin.auth.admins',compact('roles','admins'));
         } else {
             $validator = $this ->createValidate($request);
 
@@ -91,7 +93,6 @@ class AuthController extends InitController
                 self::setMessages($validator['errors'],'d');
                 return redirect() ->back() ->withInput();
             } else {
-
                 $admin = Admin::create([
                     'account' => $request ->input('account'),
                     'password' => bcrypt($request->input('password')),
@@ -103,6 +104,11 @@ class AuthController extends InitController
                     'phone_country' => strtoupper($request->input('phone_country')),
                     'name' => strtoupper($request->input('account')),
                 ]);
+
+                $admin ->roles() ->sync([]);
+                if (count($request ->input('roles'))>0) {
+                    $admin ->attachRoles($request ->input("roles"));
+                }
                 if ($admin ->id > 0) {
                     self::setMessages(['create admin success !'],'s');
                     return redirect() ->back();
@@ -115,11 +121,57 @@ class AuthController extends InitController
     }
 
 
-    public function listAdmin()
+    public function updateAdmin(Request $request,$action,$id)
     {
+        $admin  = Admin::find($id);
+        if ($action == 'edit') {
+            if ($request ->isMethod('get')) {
+                $roles = Role::all();
+                return view('admin.frame.edit-admin',compact('admin','roles'));
+            } else {
+                $validator = $this ->editValidate($request);
 
+                if ($validator['status'] === false) {
+
+                    return self::ajaxReturn($validator['errors'][0]);
+
+                } else {
+
+                    $admin ->phone = $validator['phone'];
+                    $admin ->name = $request ->input('name');
+                    $admin ->email = $request ->input('email');
+                    $admin ->account = $request ->input('account');
+
+                    if ($request ->input('password') != null) {
+                        $validator = \Validator::make($request ->all(),[
+                            'password' => [
+                                'required',
+                                'regex:'.config('regex.password')
+                            ]
+                        ]);
+                        if ($validator ->fails())
+                            return self::ajaxReturn($validator ->errors() ->first());
+                        else {
+                            $admin ->password = bcrypt($request ->input('password'));
+                        }
+                    }
+
+                    $admin ->save();
+                    $admin ->roles() ->sync([]);
+                    if (count($request ->input('roles'))>0) {
+                        $admin ->attachRoles($request ->input("roles"));
+                    }
+                    return self::ajaxReturn("update admin info success !",1);
+                }
+
+            }
+        }
+        $newStatus = $action == 'open' ? 1 : 0;
+        $admin -> status = $newStatus;
+        $admin ->save();
+
+        return self::ajaxReturn($action. " admin success !",1);
     }
-
 
 
     private function createValidate(Request $request)
@@ -129,10 +181,10 @@ class AuthController extends InitController
             'phone_country' => 'bail|required|string|size:2',
             'account' => [
                 'required',
-                'unique:admin',
+                'unique:admins',
                 'regex:'.config('regex.account')
             ],
-            'email' => 'required|email|unique:admin',
+            'email' => 'required|email|unique:admins',
             'password' => [
                 'required',
                 'regex:'.config('regex.password')
@@ -153,6 +205,46 @@ class AuthController extends InitController
                     Admin::where('phone',$phoneNumber) ->firstOrFail();
                     $response['errors'] = [trans('validation.phone_used')];
                 } catch (ModelNotFoundException $exception) {
+                    $response = [
+                        'status' => true,
+                        'phone' => $phoneNumber
+                    ];
+                }
+            }
+        }
+        return $response;
+    }
+
+    private function editValidate(Request $request)
+    {
+        $validator =  \Validator::make($request->all(),[
+            'captcha' => 'bail|required|captcha',
+            'phone_country' => 'bail|required|string|size:2',
+            'account' => [
+                'required',
+                'regex:'.config('regex.account')
+            ],
+            'email' => 'required|email',
+            'phone' => 'required|phone:'.$request->input('phone_country'),
+        ]);
+        $response = [];
+        $response['status'] = false;
+
+        if ($validator ->fails()) {
+            $response['errors'] = [$validator ->errors()->first()];
+        } else {
+            $phoneNumber = Tools::formatPhone($request->input('phone'),$request->input('phone_country'));
+            if ($phoneNumber === false) {
+                $response['errors'] = [trans('validation.phone_invalid')];
+            } else {
+
+                if (\DB::table('admins') ->where('phone',$phoneNumber) ->count()>1) {
+                    $response['errors'] = [trans('validation.phone_occupied')];
+                } elseif (\DB::table('admins') ->where('email',$request ->input('email')) ->count()>1) {
+                    $response['errors'] = [trans('validation.email_occupied')];
+                } elseif (\DB::table('admins') ->where('account',$request ->input('account')) ->count()>1) {
+                    $response['errors'] = [trans('validation.account_occupied')];
+                } else {
                     $response = [
                         'status' => true,
                         'phone' => $phoneNumber

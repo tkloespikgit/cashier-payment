@@ -236,45 +236,42 @@
                 <ul class="nav" id="side-menu">
                     <li class="sidebar-search">
                         <div class="input-group custom-search-form">
-                            <input type="text" class="form-control" placeholder="Search...">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default" type="button">
-                                    <i class="fa fa-search"></i>
-                                </button>
-                            </span>
+                            <span class="text text-primary"><i class="fa fa-user">&nbsp;&nbsp;&nbsp;{{auth('admin')->user()->name}}</i></span>
                         </div>
                     </li>
                     <li>
                         <a href="{{url('/dashboard')}}"><i class="fa fa-dashboard fa-fw"></i>&nbsp;&nbsp;首页</a>
                     </li>
-                    <li>
-                        <a href="#"><i class="fa fa-user"></i>&nbsp;&nbsp;&nbsp;用户系统<span class="fa arrow"></span></a>
-                        <ul class="nav nav-second-level">
-                            <li>
-                                <a href="{{url('user/create')}}">添加用户</a>
-                            </li>
-                            <li>
-                                <a href="{{url('user/list')}}">用户列表</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="#"><i class="fa fa-user"></i>&nbsp;&nbsp;&nbsp;权限系统<span class="fa arrow"></span></a>
-                        <ul class="nav nav-second-level">
-                            <li>
-                                <a href="{{url('admin/create')}}">添加管理员</a>
-                            </li>
-                            <li>
-                                <a href="{{url('admin/list')}}">管理员管理</a>
-                            </li>
-                            <li>
-                                <a href="{{url('permissions/list')}}">权限管理</a>
-                            </li>
-                            <li>
-                                <a href="{{url('roles/list')}}">角色管理</a>
-                            </li>
-                        </ul>
-                    </li>
+
+                    @if(auth('admin')->user()->hasRole('userManage'))
+                        <li>
+                            <a href="#"><i class="fa fa-user-secret"></i>&nbsp;&nbsp;&nbsp;用户系统<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a href="{{url('user/create')}}">添加用户</a>
+                                </li>
+                                <li>
+                                    <a href="{{url('user/list')}}">用户列表</a>
+                                </li>
+                            </ul>
+                        </li>
+                    @endif
+                    @if(auth('admin')->user()->hasRole('authManage'))
+                        <li>
+                            <a href="#"><i class="fa fa-cogs"></i>&nbsp;&nbsp;&nbsp;权限系统<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a href="{{url('admins/list')}}">管理员管理</a>
+                                </li>
+                                <li>
+                                    <a href="{{url('permissions/list')}}">权限管理</a>
+                                </li>
+                                <li>
+                                    <a href="{{url('roles/list')}}">角色管理</a>
+                                </li>
+                            </ul>
+                        </li>
+                    @endif
                 </ul>
             </div>
         </div>

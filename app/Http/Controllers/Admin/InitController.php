@@ -37,4 +37,15 @@ class InitController extends Controller
         return true;
     }
 
+
+
+    protected static function ajaxReturn($message = 'Errors ,please try again',$status = 0)
+    {
+        return response() ->json([
+            'status' => $status,
+            'message' => $message
+        ]);
+
+    }
+
 }
