@@ -105,7 +105,9 @@ return [
         ],
     ],
 
-    'maxLoginAttempts' => env('LOGIN_ATTEMPT',100),
+    'maxLoginAttempts' => env('LOGIN_ATTEMPT',5),
     'lockTime' => 20, // minutes
+    'model' => App\Admin::class,
+
 
 ];

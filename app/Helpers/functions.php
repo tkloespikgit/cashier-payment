@@ -110,3 +110,16 @@ function curlPost($url,array $params = [],array $headers = [],$isHttps = false)
     ];
 
 }
+
+function hideString(string $string)
+{
+    $len = strlen($string);
+    $hideLen = (int)($len/3);
+    return substr($string,0,$hideLen) . str_repeat("*",$len-$hideLen*2) . substr($string,-$hideLen);
+}
+
+function hideEmails(string $emails)
+{
+    $array = explode("@",$emails);
+    return hideString($array[0])."@".$array[1];
+}

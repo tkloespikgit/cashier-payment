@@ -9,17 +9,6 @@
     <meta name="author" content="toby chan">
     <title>{{config('app.name')}}</title>
     @include('include.admin-links')
-    <style>
-        .navbar-top-links li a:hover{
-            background: none;
-        }
-        .nav .open>a, .nav .open>a:focus, .nav .open>a:hover{
-            background: none;
-        }
-        a.dropdown-toggle{
-            background: none;
-        }
-    </style>
 </head>
 <body>
 <div id="wrapper">
@@ -223,10 +212,11 @@
                     <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-user">
-                    <li><a href="#"><i class="fa fa-gear fa-fw"></i>个人设置</a>
+                    <li><a href="{{url('self/setting')}}"><i class="fa fa-gear fa-fw"></i>个人设置</a>
                     </li>
                     <li class="divider"></li>
-                    <li><a href="{{url('logout')}}"><i class="fa fa-sign-out fa-fw"></i>登出</a>
+                    <li>
+                        <a href="{{url('logout')}}"><i class="fa fa-sign-out fa-fw"></i>登出</a>
                     </li>
                 </ul>
             </li>
@@ -236,7 +226,7 @@
                 <ul class="nav" id="side-menu">
                     <li class="sidebar-search">
                         <div class="input-group custom-search-form">
-                            <span class="text text-primary"><i class="fa fa-user">&nbsp;&nbsp;&nbsp;{{auth('admin')->user()->name}}</i></span>
+                            <a href="{{url('self/setting')}}"><span class="text text-primary"><i class="fa fa-user">&nbsp;&nbsp;&nbsp;{{auth('admin')->user()->name}}</i></span></a>
                         </div>
                     </li>
                     <li>
@@ -245,13 +235,13 @@
 
                     @if(auth('admin')->user()->hasRole('userManage'))
                         <li>
-                            <a href="#"><i class="fa fa-user-secret"></i>&nbsp;&nbsp;&nbsp;用户系统<span class="fa arrow"></span></a>
+                            <a href="#"><i class="fa fa-user-secret"></i>&nbsp;&nbsp;&nbsp;商户系统<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
                                 <li>
-                                    <a href="{{url('user/create')}}">添加用户</a>
+                                    <a href="{{url('user/create')}}">添加商户</a>
                                 </li>
                                 <li>
-                                    <a href="{{url('user/list')}}">用户列表</a>
+                                    <a href="{{url('user/list')}}">商户列表</a>
                                 </li>
                             </ul>
                         </li>

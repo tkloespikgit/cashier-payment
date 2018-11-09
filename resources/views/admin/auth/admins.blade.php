@@ -28,7 +28,8 @@
                                     @else
                                         <a href="javascript:void(0)" title="Allowed to log in" onclick="SystemFunc.ajaxGet('{{url('admins/modify/open',$admin ->id)}}')" class="btn btn-xs btn-success" ><i class="fa fa-check"></i></a>
                                     @endif
-                                        <a href="javascript:void(0)" data-url="{{url('admins/modify/edit',$admin ->id)}}" class="btn btn-xs btn-primary open-frame" ><i class="fa fa-edit"></i></a>
+                                    <a href="javascript:void(0)" data-url="{{url('admins/modify/edit',$admin ->id)}}" class="btn btn-xs btn-primary open-frame" ><i class="fa fa-edit"></i></a>
+                                        <a href="{{url('admins/modify/view',$admin ->id)}}" class="btn btn-xs btn-info" ><i class="fa fa-eye"></i></a>
                                 </td>
                             </tr>
                         @endforeach

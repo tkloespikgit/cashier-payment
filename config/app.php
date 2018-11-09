@@ -239,4 +239,5 @@ return [
         'Entrust' => Zizaco\Entrust\EntrustFacade::class,
     ],
 
+
 ];

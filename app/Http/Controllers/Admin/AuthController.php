@@ -165,12 +165,47 @@ class AuthController extends InitController
                 }
 
             }
+        } elseif ($action == 'view') {
+
+            $roles = Role::all();
+            return view('admin.auth.admin-details',compact('admin','roles'));
         }
         $newStatus = $action == 'open' ? 1 : 0;
         $admin -> status = $newStatus;
         $admin ->save();
 
         return self::ajaxReturn($action. " admin success !",1);
+    }
+
+
+    public function selfSetting(Request $request)
+    {
+        $admin = \Auth::guard('admin') ->user();
+        $admin = Admin::find($admin ->id);
+        if ($request ->isMethod('post')) {
+
+            $validator = \Validator::make($request ->all(),[
+                'name' => 'required|max:20',
+                'captcha' => 'required|required',
+                'password' => [
+                    'required','regex:'.config('regex.password')
+                ]
+            ]);
+
+            if ($validator ->fails()) {
+                self::setMessages($validator ->errors() ->all());
+            } else {
+                $admin ->name = $request ->input('name');
+                $admin ->password = bcrypt($request ->input('password'));
+                $admin ->save();
+                self::setMessages(['update success !'],'s');
+                return redirect() ->back();
+            }
+
+        } else {
+            return view('admin.auth.admin-self',compact('admin'));
+        }
+
     }
 
 

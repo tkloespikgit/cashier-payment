@@ -7,4 +7,19 @@
     a.open-frame {
         cursor: pointer;
     }
+
+    .inline-key {
+        display: inline-block;
+        min-width: 120px;
+    }
+
+    .navbar-top-links li a:hover{
+        background: none;
+    }
+    .nav .open>a, .nav .open>a:focus, .nav .open>a:hover{
+        background: none;
+    }
+    a.dropdown-toggle{
+        background: none;
+    }
 </style>

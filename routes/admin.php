@@ -20,6 +20,7 @@ Route::group(['middleware'=> 'adminGuard'],function (){
 //admin control
     Route::any('admins/list',"AuthController@createAdmin");
     Route::any('admins/modify/{action}/{id}',"AuthController@updateAdmin");
+    Route::any('self/setting',"AuthController@selfSetting");
 
 
     Route::any('permissions/list',"PermissionController@listPermission");
